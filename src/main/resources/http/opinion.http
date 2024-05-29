@@ -1,0 +1,79 @@
+### Login (Test User)
+POST http://localhost:8080/api/auth/login
+Content-Type: application/x-www-form-urlencoded
+
+email=testuser123@example.com&name=Test User321
+
+
+### Create Opinion (Valid Request)
+POST http://localhost:8080/api/opinions
+Content-Type: application/json
+
+{
+  "billId": 1,
+  "detail": "Test Opinion",
+  "grade": 5
+}
+
+### Create Opinion (Unauthorized User)
+POST http://localhost:8080/api/opinions
+Content-Type: application/json
+
+{
+  "billId": 1,
+  "detail": "Test Opinion",
+  "grade": 5
+}
+
+### Get Opinion (Valid Opinion)
+GET http://localhost:8080/api/opinions/2
+
+### Get Opinion (Non-existing Opinion)
+GET http://localhost:8080/api/opinions/9999
+
+
+### Get Opinions by Bill ID (Valid Bill ID)
+GET http://localhost:8080/api/opinions/bill/1
+
+### Get Opinions by Bill ID (Non-existing Bill ID)
+GET http://localhost:8080/api/opinions/bill/9999
+
+
+### Update Opinion (Valid Request)
+PUT http://localhost:8080/api/opinions/4
+Content-Type: application/json
+
+{
+  "billId": 1,
+  "detail": "Updated Opinion",
+  "grade": 4
+}
+
+### Update Opinion (Bill Mismatch)
+PUT http://localhost:8080/api/opinions/4
+Content-Type: application/json
+
+{
+  "billId": 101,
+  "detail": "Updated Opinion",
+  "grade": 4
+}
+
+
+### Delete Opinion (Valid Request)
+DELETE http://localhost:8080/api/opinions/1
+
+### Delete Opinion (Unauthorized User)
+DELETE http://localhost:8080/api/opinions/4
+# 이 요청은 다른 사용자로 로그인한 후 실행하여 다른 사용자의 의견을 삭제하는 상황을 테스트
+
+### Delete Opinion (Non-existing Opinion)
+DELETE http://localhost:8080/api/opinions/9999
+
+
+### Test Data Insertion (Bill Records)
+#INSERT INTO BILL (BILL_NO, CREATED_DATE, LAST_MODIFIED_DATE, DATE, FILE_LINK, PROPOSER, TITLE)
+#VALUES
+#(101, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '2023-01-01', 'http://example.com/bill101.pdf', 'Proposer A', 'Bill Title A'),
+#(102, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '2023-02-01', 'http://example.com/bill102.pdf', 'Proposer B', 'Bill Title B'),
+#(103, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '2023-03-01', 'http://example.com/bill103.pdf', 'Proposer C', 'Bill Title C');
