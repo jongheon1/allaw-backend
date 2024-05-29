@@ -10,8 +10,8 @@ import org.springframework.web.client.RestTemplate;
 import site.allawbackend.dto.ChatRequestDto;
 import site.allawbackend.dto.ChatResponseDto;
 import site.allawbackend.dto.SummaryRequestDto;
-import site.allawbackend.entity.Bills;
-import site.allawbackend.repository.BillsRepository;
+import site.allawbackend.entity.Bill;
+import site.allawbackend.repository.BillRepository;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -22,7 +22,7 @@ import java.net.URL;
 public class ChatGptService {
     private final RestTemplate restTemplate;
 
-    private final BillsRepository billsRepository;
+    private final BillRepository billRepository;
 
     @Value("${openai.sum-system-prompt}")
     private String SumSystemPrompt;
@@ -72,9 +72,9 @@ public class ChatGptService {
     }
 
     public String summary(Integer billsNum){
-        Bills bills = billsRepository.findById(billsNum).orElseThrow();
+        Bill bill = billRepository.findByBillNo(billsNum).orElseThrow();
 
-        String link = bills.getFile_link();
+        String link = bill.getFileLink();
         try (BufferedInputStream in = new BufferedInputStream(new URL(link).openStream());){
             PDDocument document = PDDocument.load(in);
             PDFTextStripper stripper = new PDFTextStripper();
@@ -95,16 +95,16 @@ public class ChatGptService {
     }
 
     public String checkChat(String prompt, Integer billsNum) {
-        Bills bills = billsRepository.findById(billsNum).orElseThrow();
+        Bill bill = billRepository.findByBillNo(billsNum).orElseThrow();
 
-        String link = bills.getFile_link();
+        String link = bill.getFileLink();
 
         try (BufferedInputStream in = new BufferedInputStream(new URL(link).openStream());){
             PDDocument document = PDDocument.load(in);
             PDFTextStripper stripper = new PDFTextStripper();
             String extractText = stripper.getText(document);
 
-            String txt = prompt + extractText +"External references include a '(출처:" + bills.getTitle() +") citation.";
+            String txt = prompt + extractText +"External references include a '(출처:" + bill.getTitle() +") citation.";
 
             ChatRequestDto request = new ChatRequestDto(chatModel, txt, ChatSystemPrompt);
 
