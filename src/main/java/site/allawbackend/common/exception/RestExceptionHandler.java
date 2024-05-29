@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import site.allawbackend.chat.service.GptServiceException;
 import site.allawbackend.common.ApiResponse;
 import site.allawbackend.opinion.service.OpinionNotFoundException;
 
@@ -60,4 +61,21 @@ public class RestExceptionHandler {
                 .status(NOT_FOUND)
                 .body(error(e.getMessage()));
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException e) {
+        log.error("처리 중 오류 발생: {}", e.getMessage());
+        return ResponseEntity
+                .status(INTERNAL_SERVER_ERROR)
+                .body(error(e.getMessage()));
+    }
+
+    @ExceptionHandler(GptServiceException.class)
+    public ResponseEntity<ApiResponse<Void>> handleGptServiceException(GptServiceException e) {
+        log.error("GPT 서비스 응답 중 오류 발생: {}", e.getMessage());
+        return ResponseEntity
+                .status(INTERNAL_SERVER_ERROR)
+                .body(error(e.getMessage()));
+    }
+
 }
