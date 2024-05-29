@@ -1,21 +1,18 @@
 package site.allawbackend.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import site.allawbackend.common.BaseEntity;
 
 @Getter
-@Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name="subscription")
-public class Subscription {
+public class Subscription extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "subscription_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
