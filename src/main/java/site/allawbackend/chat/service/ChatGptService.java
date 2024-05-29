@@ -1,16 +1,17 @@
-package site.allawbackend.service;
+package site.allawbackend.chat.service;
 
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import site.allawbackend.chat.dto.ChatRequestDto;
+import site.allawbackend.chat.dto.ChatResponseDto;
+import site.allawbackend.chat.dto.SummaryRequestDto;
 import site.allawbackend.common.exception.BillNotFoundException;
-import site.allawbackend.dto.ChatRequestDto;
-import site.allawbackend.dto.ChatResponseDto;
-import site.allawbackend.dto.SummaryRequestDto;
 import site.allawbackend.entity.Bill;
 import site.allawbackend.repository.BillRepository;
 
@@ -20,10 +21,12 @@ import java.net.URL;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ChatGptService {
     private final RestTemplate restTemplate;
 
     private final BillRepository billRepository;
+    private final GptService gptService;
 
     @Value("${openai.sum-system-prompt}")
     private String SumSystemPrompt;
@@ -73,25 +76,25 @@ public class ChatGptService {
     }
 
     public String summary(Long billId){
-        Bill bill = getBill(billId);
-
-        String link = bill.getFileLink();
-        try (BufferedInputStream in = new BufferedInputStream(new URL(link).openStream());){
-            PDDocument document = PDDocument.load(in);
-            PDFTextStripper stripper = new PDFTextStripper();
-            String extractText = stripper.getText(document);
-            SummaryRequestDto request = new SummaryRequestDto(sumModel, extractText, SumSystemPrompt);
-
-            // call the API
-            ChatResponseDto response = restTemplate.postForObject(apiUrl, request, ChatResponseDto.class);
-
-            if (response == null || response.getChoices() == null || response.getChoices().isEmpty()) {
-                return "No response";
+        try {
+            Bill bill = getBill(billId);
+            if (bill.getSummary() != null) {
+                return bill.getSummary();
             }
-            return response.getChoices().get(0).getMessage().getContent();
-        }
-        catch (IOException ignored) {
-            return "No response";
+
+            String link = bill.getFileLink();
+            String extractText = PdfUtil.extractTextFromPdf(link);
+
+            String summary = gptService.summarize(sumModel, extractText, SumSystemPrompt);
+
+            bill.saveSummary(summary);
+            billRepository.save(bill);
+
+            return summary;
+        } catch (IOException e) {
+            return "Failed to process the document: " + e.getMessage();
+        } catch (Exception e) {
+            return "An error occurred: " + e.getMessage();
         }
     }
 
