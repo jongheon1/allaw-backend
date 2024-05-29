@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import site.allawbackend.service.ChatGptService;
 
 @RestController
-@RequestMapping("/gpt")
+@RequestMapping("/api/gpt")
 @RequiredArgsConstructor
 public class ChatGptController {
     private final ChatGptService chatGptService;
@@ -15,16 +15,16 @@ public class ChatGptController {
         return chatGptService.chat(prompt);
     }
 
-    @PostMapping("/{billsNum}/summary")
+    @PostMapping("/{billId}/summary")
     public String summary(
-    @PathVariable final Integer billsNum){
-        return chatGptService.summary(billsNum);
+    @PathVariable Long billId){
+        return chatGptService.summary(billId);
     }
 
-    @PostMapping("/{billsNum}/pdfChat")
+    @PostMapping("/{billId}/pdfChat")
     public String pdfChat(@RequestBody String prompt,
-                          @PathVariable final Integer billsNum){
-        return chatGptService.checkChat(prompt,billsNum);
+                          @PathVariable Long billId){
+        return chatGptService.checkChat(prompt, billId);
     }
 
     @PostMapping("/agree")

@@ -7,6 +7,7 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import site.allawbackend.common.exception.BillNotFoundException;
 import site.allawbackend.dto.ChatRequestDto;
 import site.allawbackend.dto.ChatResponseDto;
 import site.allawbackend.dto.SummaryRequestDto;
@@ -71,8 +72,8 @@ public class ChatGptService {
         return response.getChoices().get(0).getMessage().getContent();
     }
 
-    public String summary(Integer billsNum){
-        Bill bill = billRepository.findByBillNo(billsNum).orElseThrow();
+    public String summary(Long billId){
+        Bill bill = getBill(billId);
 
         String link = bill.getFileLink();
         try (BufferedInputStream in = new BufferedInputStream(new URL(link).openStream());){
@@ -94,8 +95,8 @@ public class ChatGptService {
         }
     }
 
-    public String checkChat(String prompt, Integer billsNum) {
-        Bill bill = billRepository.findByBillNo(billsNum).orElseThrow();
+    public String checkChat(String prompt, Long billId) {
+        Bill bill = getBill(billId);
 
         String link = bill.getFileLink();
 
@@ -153,4 +154,10 @@ public class ChatGptService {
         // return the first response
         return response.getChoices().get(0).getMessage().getContent();
     }
+
+    private Bill getBill(Long billId) {
+        return billRepository.findById(billId)
+                .orElseThrow(() -> new BillNotFoundException(billId));
+    }
+
 }
