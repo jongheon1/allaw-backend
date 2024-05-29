@@ -22,16 +22,13 @@ public class GptService {
         return callGptApi(request);
     }
 
-    public String summarize(String model, String text, String systemPrompt) {
-        ChatRequestDto request = new ChatRequestDto(model, text, systemPrompt);
-        return callGptApi(request);
-    }
-
     private String callGptApi(ChatRequestDto request) {
         ChatResponseDto response = restTemplate.postForObject(apiUrl, request, ChatResponseDto.class);
+
         if (response == null || response.getChoices() == null || response.getChoices().isEmpty()) {
-            return "No response";
+            throw new GptServiceException("No response from GPT service");
         }
+
         return response.getChoices().get(0).getMessage().getContent();
     }
 }
