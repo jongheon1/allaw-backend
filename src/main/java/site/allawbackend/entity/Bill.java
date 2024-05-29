@@ -28,6 +28,9 @@ public class Bill extends BaseEntity {
     @Column(name = "file_link")
     private String fileLink;
 
+    @Lob
+    @Column(name = "summary", columnDefinition = "TEXT")
+    private String summary;
     public Bill(Long id, Integer billNo, String title, String proposer, String date, String fileLink) {
         this.id = id;
         this.billNo = billNo;
@@ -35,6 +38,10 @@ public class Bill extends BaseEntity {
         this.proposer = proposer;
         this.date = date;
         this.fileLink = fileLink;
+    }
+
+    public void saveSummary(String summary){
+        this.summary = summary;
     }
 }
 
