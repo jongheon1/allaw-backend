@@ -1,8 +1,8 @@
-package site.allawbackend.controller;
+package site.allawbackend.chat.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import site.allawbackend.service.ChatGptService;
+import site.allawbackend.chat.service.ChatGptService;
 
 @RestController
 @RequestMapping("/api/gpt")
