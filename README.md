@@ -62,7 +62,7 @@ Allaw Service는 ElasticSearch와 OpenAI GPT 모델을 활용하여 법안 정�
 | 구독 조회   | GET    | /subscriptions         | 현재 사용자의 모든 구독을 조회합니다. |
 
 ---
-## 🛠️ 기술 스택
+## 기술 스택
 - Java 17
 - Spring Boot 3
 - Spring Data JPA
